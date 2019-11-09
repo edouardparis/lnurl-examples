@@ -4,6 +4,8 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json;
 
+use crate::error::Error;
+
 pub struct Client {
     pub clt: reqwest::Client,
     pub host: String,
@@ -19,11 +21,6 @@ impl Client {
             host: host.to_string(),
         }
     }
-}
-
-pub enum Error {
-    Http(reqwest::Error),
-    Opennode(opennode::error::RequestError)
 }
 
 #[derive(Debug, Deserialize)]
