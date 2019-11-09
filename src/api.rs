@@ -33,8 +33,8 @@ pub fn lnurl_withdrawal(faucet: Arc<Faucet>) ->Result<Response<Body>, error::Gen
         default_description: "ln-faucet".to_string(),
         callback: faucet.callback.clone(),
         k1: "secret".to_string(),
-        max_withdrawable: 1000,
-        min_withdrawable: Some(10),
+        max_withdrawable: faucet.amount_max_withdrawable,
+        min_withdrawable: Some(faucet.amount_min_withdrawable),
         tag: lnurl::Tag::WithdrawalRequest,
     })
     .unwrap();

@@ -26,8 +26,8 @@ impl Faucet {
         let img = image::DynamicImage::ImageLuma8(code.render::<Luma<u8>>().build());
         img.write_to(&mut image, ImageOutputFormat::PNG).unwrap();
         Faucet {
-            amount_max_withdrawable: 1_000_000,
-            amount_min_withdrawable: 10,
+            amount_max_withdrawable: 5_000_000,
+            amount_min_withdrawable: 10000,
             qrcode: image,
             remain_counter: remain_counter,
             lnurl: url.to_string(),
