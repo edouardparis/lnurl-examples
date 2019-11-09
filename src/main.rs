@@ -5,7 +5,7 @@ pub mod faucet;
 pub mod client;
 
 use dotenv::dotenv;
-use hyper::{Body, Request, Response, Server};
+use hyper::Server;
 use hyper::service::{make_service_fn, service_fn};
 use regex::Regex;
 
@@ -25,7 +25,7 @@ async fn main() {
     }
 
     let client = client::Client::new("hello", "hello");
-    let faucet = faucet::Faucet::new("hello", client);
+    let _faucet = faucet::Faucet::new("hello", client);
 
     // And a MakeService to handle each connection...
     let make_service = make_service_fn(|_| async {

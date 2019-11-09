@@ -1,6 +1,5 @@
 use hyper::header;
-use reqwest::Response;
-use opennode::withdrawal::Withdrawal;
+use opennode::withdrawal;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json;
@@ -61,7 +60,6 @@ where
     Err(Error::Opennode(e))
 }
 
-// async fn create_withdrawal(client: &Client, invoice: &str) -> Result<Withdrawal, GenericError> {
-//     let req = request::builder().method(Method)
-
-// }
+pub async fn create_withdrawal(client: &Client, invoice: &str) -> Result<withdrawal::Withdrawal, Error> {
+    post(client, "/v2/withdrawals", Some(withdrawal::Payload::new(withdrawal::Type::Ln, invoice, None))).await
+}

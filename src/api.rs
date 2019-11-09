@@ -1,5 +1,5 @@
 use crate::error;
-use hyper::{Body, Error, Method, Request, Response, Server, StatusCode};
+use hyper::{Body, Method, Request, Response, StatusCode};
 
 static INDEX: &[u8] = b"<h1> Welcome to api !</h1>";
 static NOTFOUND: &[u8] = b"Not Found";
