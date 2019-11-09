@@ -55,6 +55,13 @@ pub async fn create_withdrawal(req: Request<Body>, faucet: Arc<Faucet>) -> Resul
         Some(i) => i,
     };
 
+    if let Err(e) = faucet.pay_invoice(invoice.to_string()).await {
+        match e {
+            error::Error::BadInvoice => return lnurl_error("bad pr"),
+            _ => {error!("{:?}", e); return lnurl_error("internal_error")},
+        }
+    }
+
     lnurl_ok()
 }
 

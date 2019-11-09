@@ -6,7 +6,7 @@ pub mod client;
 pub mod lnurl;
 
 use dotenv::dotenv;
-use hyper::{Body, Response, Method, Request, Server, StatusCode};
+use hyper::{Body, Response, Server};
 use hyper::service::{make_service_fn, service_fn};
 use regex::Regex;
 use std::sync::{Arc, atomic::AtomicUsize};

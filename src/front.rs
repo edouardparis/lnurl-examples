@@ -1,8 +1,5 @@
 use hyper::{Body, Method, Request, Response, StatusCode};
-use std::sync::{
-    atomic::{AtomicUsize, Ordering},
-    Arc,
-};
+use std::sync::{atomic::Ordering, Arc};
 
 use crate::error;
 use crate::faucet::Faucet;
