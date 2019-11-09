@@ -8,6 +8,7 @@ use dotenv::dotenv;
 use hyper::Server;
 use hyper::service::{make_service_fn, service_fn};
 use regex::Regex;
+use std::sync::{Arc, atomic::AtomicUsize};
 
 #[macro_use]
 extern crate log;
@@ -25,16 +26,22 @@ async fn main() {
     }
 
     let client = client::Client::new("hello", "hello");
-    let _faucet = faucet::Faucet::new("hello", client);
+    let faucet = Arc::new(faucet::Faucet::new("hello", client, AtomicUsize::new(10)));
 
     // And a MakeService to handle each connection...
-    let make_service = make_service_fn(|_| async {
-        Ok::<_, error::GenericError>(service_fn(move |req| async {
-            if API.is_match(req.uri().path()) {
-                return api::routes(req)
-            }
-            front::routes(req)
-        }))
+    let make_service = make_service_fn(move |_| {
+        let faucet = Arc::clone(&faucet);
+        async move {
+            Ok::<_, error::GenericError>(service_fn(move |req| {
+                let faucet = Arc::clone(&faucet);
+                async move {
+                    if API.is_match(req.uri().path()) {
+                        return api::routes(req, faucet)
+                    }
+                    front::routes(req, faucet)
+                }
+            }))
+        }
     });
 
     env_logger::init();
