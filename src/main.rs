@@ -37,8 +37,8 @@ async fn main() {
 
     let client = client::Client::new(&opennode_api_url, &key);
     let faucet = Arc::new(faucet::Faucet::new(
-            &format!("{}/lnurl/withdrawal", api_url),
-            &format!("{}/withdrawals/create", api_url),
+            &format!("{}/api/lnurl/withdrawal", api_url),
+            &format!("{}/api/withdrawals/create", api_url),
             client, AtomicUsize::new(0)
     ));
 
