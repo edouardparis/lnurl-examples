@@ -12,7 +12,7 @@ pub fn routes(
     faucet: Arc<Faucet>,
 ) -> Result<Response<Body>, error::GenericError> {
     match (req.method(), req.uri().path()) {
-        (&Method::GET, "/api/hello") => Ok(Response::new(INDEX.into())),
+        (&Method::GET, "/api/lnurl/withdrawal") => Ok(Response::new(INDEX.into())),
         _ => {
             // Return 404 not found response.
             Ok(Response::builder()
