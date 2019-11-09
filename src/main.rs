@@ -9,6 +9,7 @@ use hyper::Server;
 use hyper::service::{make_service_fn, service_fn};
 use regex::Regex;
 use std::sync::{Arc, atomic::AtomicUsize};
+use std::env;
 
 #[macro_use]
 extern crate log;
@@ -18,6 +19,10 @@ extern crate lazy_static;
 #[tokio::main]
 async fn main() {
     dotenv().ok();
+    let key = env::var("OPENNODE_API_KEY").expect("OPENNODE_API_KEY is needed");
+    let api_url = env::var("API_URL").expect("API_URL is needed");
+    let opennode_api_url = env::var("OPENNODE_API_URL").expect("OPENNODE_API_URL");
+
     // Construct our SocketAddr to listen on...
     let addr = ([127, 0, 0, 1], 8080).into();
 
@@ -25,8 +30,11 @@ async fn main() {
         static ref API: Regex = Regex::new(r"/api/*").unwrap();
     }
 
-    let client = client::Client::new("hello", "hello");
-    let faucet = Arc::new(faucet::Faucet::new("hello", client, AtomicUsize::new(10)));
+    let client = client::Client::new(&opennode_api_url, &key);
+    let faucet = Arc::new(faucet::Faucet::new(
+                &format!("{}/lnurl/withdrawal", api_url),
+                client, AtomicUsize::new(10)
+            ));
 
     // And a MakeService to handle each connection...
     let make_service = make_service_fn(move |_| {
