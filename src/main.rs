@@ -25,7 +25,11 @@ async fn main() {
     let opennode_api_url = env::var("OPENNODE_API_URL").expect("OPENNODE_API_URL");
 
     // Construct our SocketAddr to listen on...
-    let addr = ([127, 0, 0, 1], 8080).into();
+    let mut addr = ([127, 0, 0, 1], 8080).into();
+    let environment = env::var("API_ENV").expect("API_ENV is needed");
+    if environment == "production" {
+        addr = ([0, 0, 0, 0], 8080).into();
+    }
 
     lazy_static! {
         static ref API: Regex = Regex::new(r"/api/*").unwrap();
