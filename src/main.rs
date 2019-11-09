@@ -1,6 +1,8 @@
 pub mod error;
 pub mod front;
 pub mod api;
+pub mod faucet;
+pub mod client;
 
 use dotenv::dotenv;
 use hyper::{Body, Request, Response, Server};
@@ -21,6 +23,9 @@ async fn main() {
     lazy_static! {
         static ref API: Regex = Regex::new(r"/api/*").unwrap();
     }
+
+    let client = client::Client::new("hello", "hello");
+    let faucet = faucet::Faucet::new("hello", client);
 
     // And a MakeService to handle each connection...
     let make_service = make_service_fn(|_| async {
