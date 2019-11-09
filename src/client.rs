@@ -41,8 +41,10 @@ where
         content_type = "application/json".to_string();
     }
 
+    info!("{}", client.api_key);
     let res = client.clt.post(path)
         .header(header::CONTENT_TYPE, content_type)
+        .header("Authorization", &client.api_key)
         .body(body)
         .send()
         .await
@@ -58,5 +60,7 @@ where
 }
 
 pub async fn create_withdrawal(client: &Client, invoice: &str) -> Result<withdrawal::Withdrawal, Error> {
-    post(client, "/v2/withdrawals", Some(withdrawal::Payload::new(withdrawal::Type::Ln, invoice, None))).await
+    let mut endpoint: String = client.host.clone();
+    endpoint.push_str("/v2/withdrawals");
+    post(client, &endpoint, Some(withdrawal::Payload::new(withdrawal::Type::Ln, invoice, None))).await
 }
