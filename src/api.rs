@@ -1,7 +1,6 @@
 use hyper::{header, Body, Method, Request, Response, StatusCode};
 use std::sync::Arc;
 use std::collections::HashMap;
-use url::Url;
 
 use crate::error;
 use crate::lnurl;
@@ -28,7 +27,7 @@ pub async fn routes(
 
 pub fn lnurl_withdrawal(faucet: Arc<Faucet>) ->Result<Response<Body>, error::GenericError> {
     if faucet.is_empty() {
-       return lnurl_error("faucet is empty");
+        return lnurl_error("faucet is empty");
     }
     let withdrawal = serde_json::to_string(&lnurl::Withdrawal {
         default_description: "ln-faucet".to_string(),
@@ -45,12 +44,13 @@ pub fn lnurl_withdrawal(faucet: Arc<Faucet>) ->Result<Response<Body>, error::Gen
 }
 
 pub async fn create_withdrawal(req: Request<Body>, faucet: Arc<Faucet>) -> Result<Response<Body>, error::GenericError> {
-    let params: HashMap<String, String> = Url::parse(&req.uri().to_string())
-        .unwrap()
-        .query_pairs()
-        .into_owned()
-        .collect();
-    let invoice = match params.get("invoice") {
+    info!("{:?}", req.uri().query());
+    let params: HashMap<String, String> = match req.uri().query() {
+        Some(q) =>  q.split("&").map(|kv| kv.split('='))
+            .map(|mut kv| (kv.next().unwrap().into(), kv.next().unwrap().into())).collect(),
+        None => return lnurl_error("pr is required"),
+    };
+    let invoice = match params.get("pr") {
         None => return lnurl_error("pr is required"),
         Some(i) => i,
     };
