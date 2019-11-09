@@ -6,7 +6,7 @@ pub mod client;
 pub mod lnurl;
 
 use dotenv::dotenv;
-use hyper::Server;
+use hyper::{Body, Response, Method, Request, Server, StatusCode};
 use hyper::service::{make_service_fn, service_fn};
 use regex::Regex;
 use std::sync::{Arc, atomic::AtomicUsize};
@@ -33,10 +33,10 @@ async fn main() {
 
     let client = client::Client::new(&opennode_api_url, &key);
     let faucet = Arc::new(faucet::Faucet::new(
-                &format!("{}/lnurl/withdrawal", api_url),
-                &format!("{}/withdrawals/create", api_url),
-                client, AtomicUsize::new(0)
-            ));
+            &format!("{}/lnurl/withdrawal", api_url),
+            &format!("{}/withdrawals/create", api_url),
+            client, AtomicUsize::new(0)
+    ));
 
     // And a MakeService to handle each connection...
     let make_service = make_service_fn(move |_| {
@@ -45,10 +45,11 @@ async fn main() {
             Ok::<_, error::GenericError>(service_fn(move |req| {
                 let faucet = Arc::clone(&faucet);
                 async move {
+                    info!("{} {}", req.method(), req.uri().path());
                     if API.is_match(req.uri().path()) {
-                        return api::routes(req, faucet).await
+                        return handle(api::routes(req, faucet).await)
                     }
-                    front::routes(req, faucet)
+                    handle(front::routes(req, faucet))
                 }
             }))
         }
@@ -65,4 +66,15 @@ async fn main() {
     if let Err(e) = server.await {
         eprintln!("server error: {}", e);
     }
+}
+
+pub fn handle(res: Result<Response<Body>, error::GenericError>)
+    -> Result<Response<Body>, error::GenericError> {
+        res.map_err(|e| {
+            error!("{}", e);
+            e
+        }).and_then(|res| {
+            info!("{}", res.status());
+            Ok(res)
+        })
 }
