@@ -1,5 +1,4 @@
 use hyper::{Body, Method, Request, Response, StatusCode};
-use image::Luma;
 use std::sync::{
     atomic::{AtomicUsize, Ordering},
     Arc,
@@ -17,15 +16,14 @@ pub fn routes(
 ) -> Result<Response<Body>, error::GenericError> {
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/faucet") => {
-            let count = faucet.counter.load(Ordering::Relaxed);
-            let limit = faucet.limit.load(Ordering::Relaxed);
+            let count = faucet.remain_counter.load(Ordering::Relaxed);
             Ok(Response::new(Body::from(format!(
-                "Faucet: Limit {} Count {}",
-                limit, count
+                "<h1>Faucet</h1><p> Remain count: {}</p> <image src=\"/faucet/qrcode.png\"/>",
+                count
             ))))
         }
         (&Method::GET, "/plus") => {
-            let count = faucet.counter.fetch_add(1, Ordering::AcqRel);
+            let count = faucet.remain_counter.fetch_add(1, Ordering::AcqRel);
             Ok(Response::new(Body::from(format!("Request #{}", count + 1))))
         }
         (&Method::GET, "/faucet/qrcode.png") => {

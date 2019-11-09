@@ -3,6 +3,7 @@ pub mod front;
 pub mod api;
 pub mod faucet;
 pub mod client;
+pub mod lnurl;
 
 use dotenv::dotenv;
 use hyper::Server;
@@ -33,7 +34,8 @@ async fn main() {
     let client = client::Client::new(&opennode_api_url, &key);
     let faucet = Arc::new(faucet::Faucet::new(
                 &format!("{}/lnurl/withdrawal", api_url),
-                client, AtomicUsize::new(10)
+                &format!("{}/withdrawals/create", api_url),
+                client, AtomicUsize::new(0)
             ));
 
     // And a MakeService to handle each connection...
@@ -44,7 +46,7 @@ async fn main() {
                 let faucet = Arc::clone(&faucet);
                 async move {
                     if API.is_match(req.uri().path()) {
-                        return api::routes(req, faucet)
+                        return api::routes(req, faucet).await
                     }
                     front::routes(req, faucet)
                 }
