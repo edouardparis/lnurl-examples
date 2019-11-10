@@ -44,7 +44,8 @@ impl Faucet {
         if let Ok(signed) = invoice.parse::<SignedRawInvoice>() {
             if let Ok(i) = Invoice::from_signed(signed) {
                 if let Some(amount) = i.amount_pico_btc() {
-                    if amount >=  self.amount_min_withdrawable && amount <= self.amount_max_withdrawable {
+                    let max_fee = self.amount_max_withdrawable/100;
+                    if amount >=  self.amount_min_withdrawable && amount <= self.amount_max_withdrawable+max_fee{
                         return match create_withdrawal(&self.client, &invoice).await {
                             Ok(w) => {
                                 info!("withdrawal: {}", w.id);
