@@ -1,9 +1,9 @@
 use hyper::{header, Body, Method, Request, Response, StatusCode};
 use std::sync::Arc;
 use std::collections::HashMap;
+use lnurl;
 
 use crate::error;
-use crate::lnurl;
 use crate::faucet::Faucet;
 
 static NOTFOUND: &[u8] = b"Not Found";

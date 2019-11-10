@@ -3,7 +3,6 @@ pub mod front;
 pub mod api;
 pub mod faucet;
 pub mod client;
-pub mod lnurl;
 
 use dotenv::dotenv;
 use hyper::{Body, Response, Server};

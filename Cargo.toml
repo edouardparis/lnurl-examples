@@ -14,6 +14,7 @@ image = "0.22.3"
 lazy_static = "1.4.0"
 lightning-invoice = "0.2.0"
 log = "0.4.8"
+lnurl = "0.1.0"
 opennode = "1.0.0"
 qrcode = "0.11.0"
 reqwest = { version= "0.10.0-alpha.1", features = ["json"]}

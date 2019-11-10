@@ -593,6 +593,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "lnurl"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "serde 1.0.102 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 1.0.41 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "lnurl-examples"
 version = "0.1.0"
 dependencies = [
@@ -604,6 +613,7 @@ dependencies = [
  "image 0.22.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lightning-invoice 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lnurl 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "opennode 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "qrcode 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1956,6 +1966,7 @@ dependencies = [
 "checksum lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 "checksum libc 0.2.65 (registry+https://github.com/rust-lang/crates.io-index)" = "1a31a0627fdf1f6a39ec0dd577e101440b7db22672c0901fe00a9a6fbb5c24e8"
 "checksum lightning-invoice 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "275d0874e9e619b1d1e75c7b1dea08f005054154a49dd38beae21689b42f4bfc"
+"checksum lnurl 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d4b8dd171d24ba3ab6a3a8921b35174cc83aaad7416e260e3fcd6d91f0360a56"
 "checksum lock_api 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "f8912e782533a93a167888781b836336a6ca5da6175c05944c86cf28c31104dc"
 "checksum log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)" = "14b6052be84e6b71ab17edffc2eeabf5c2c3ae1fdb464aae35ac50c67a44e1f7"
 "checksum lzw 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "7d947cbb889ed21c2a84be6ffbaebf5b4e0f4340638cba0444907e38b56be084"
