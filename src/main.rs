@@ -40,7 +40,7 @@ async fn main() {
     let faucet = Arc::new(faucet::Faucet::new(
             &format!("{}/api/lnurl/withdrawal", api_url),
             &format!("{}/api/withdrawals/create", api_url),
-            client, 10
+            client, 60
     ));
 
     let faucet_service = faucet::start(Arc::clone(&faucet));
