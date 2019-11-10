@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Tag {
-    #[serde(rename = "withdrawalRequest")]
-    WithdrawalRequest,
+    #[serde(rename = "withdrawRequest")]
+    WithdrawRequest,
 }
 
 /// Withdrawal is a withdrawal resource.

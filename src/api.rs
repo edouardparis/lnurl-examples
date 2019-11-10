@@ -35,7 +35,7 @@ pub fn lnurl_withdrawal(faucet: Arc<Faucet>) ->Result<Response<Body>, error::Gen
         k1: "secret".to_string(),
         max_withdrawable: faucet.amount_max_withdrawable,
         min_withdrawable: Some(faucet.amount_min_withdrawable),
-        tag: lnurl::Tag::WithdrawalRequest,
+        tag: lnurl::Tag::WithdrawRequest,
     })
     .unwrap();
     Ok(Response::builder()
