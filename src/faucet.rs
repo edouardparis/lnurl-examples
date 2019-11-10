@@ -26,7 +26,7 @@ impl Faucet {
         let img = image::DynamicImage::ImageLuma8(code.render::<Luma<u8>>().build());
         img.write_to(&mut image, ImageOutputFormat::PNG).unwrap();
         Faucet {
-            amount_max_withdrawable: 5_000_000,
+            amount_max_withdrawable: 1_000_000,
             amount_min_withdrawable: 10000,
             qrcode: image,
             remain_counter: remain_counter,
@@ -44,8 +44,10 @@ impl Faucet {
         if let Ok(signed) = invoice.parse::<SignedRawInvoice>() {
             if let Ok(i) = Invoice::from_signed(signed) {
                 if let Some(amount) = i.amount_pico_btc() {
-                    let max_fee = self.amount_max_withdrawable/100;
-                    if amount >=  self.amount_min_withdrawable && amount <= self.amount_max_withdrawable+max_fee{
+                    let converted_amount = amount/10;
+                    let max_fee = self.amount_max_withdrawable/10;
+                    if converted_amount >=  self.amount_min_withdrawable &&
+                        converted_amount <= self.amount_max_withdrawable+max_fee{
                         return match create_withdrawal(&self.client, &invoice).await {
                             Ok(w) => {
                                 info!("withdrawal: {}", w.id);
