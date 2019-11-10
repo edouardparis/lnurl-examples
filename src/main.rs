@@ -9,8 +9,9 @@ use dotenv::dotenv;
 use hyper::{Body, Response, Server};
 use hyper::service::{make_service_fn, service_fn};
 use regex::Regex;
-use std::sync::{Arc, atomic::AtomicUsize};
+use std::sync::Arc;
 use std::env;
+use futures_util::future::join;
 
 #[macro_use]
 extern crate log;
@@ -39,8 +40,10 @@ async fn main() {
     let faucet = Arc::new(faucet::Faucet::new(
             &format!("{}/api/lnurl/withdrawal", api_url),
             &format!("{}/api/withdrawals/create", api_url),
-            client, AtomicUsize::new(0)
+            client, 10
     ));
+
+    let faucet_service = faucet::start(Arc::clone(&faucet));
 
     // And a MakeService to handle each connection...
     let make_service = make_service_fn(move |_| {
@@ -67,7 +70,8 @@ async fn main() {
         .serve(make_service);
 
     // Finally, spawn `server` onto an Executor...
-    if let Err(e) = server.await {
+    let (s_res, _) = join(server, faucet_service).await;
+    if let Err(e)  = s_res {
         eprintln!("server error: {}", e);
     }
 }

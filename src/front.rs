@@ -13,15 +13,23 @@ pub fn routes(
 ) -> Result<Response<Body>, error::GenericError> {
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/faucet") => {
-            let count = faucet.remain_counter.load(Ordering::Relaxed);
+            if faucet.is_locked() {
+                let time = faucet.remained_time.load(Ordering::Relaxed);
+                return Ok(Response::new(Body::from(format!(
+                    "<h1>Faucet is locked </h1>
+                    <p> wait for: {} seconds</p>
+                    <image src=\"/faucet/qrcode.png\"/>",
+                    time
+                ))));
+            }
             Ok(Response::new(Body::from(format!(
-                "<h1>Faucet</h1><p> Remain count: {}</p> <image src=\"/faucet/qrcode.png\"/>",
-                count
+                "<h1>Faucet is open </h1>
+                <p> min withdrawable: {} Sats</p>
+                <p> max withdrawable: {} Sats</p>
+                <image src=\"/faucet/qrcode.png\"/>",
+                faucet.amount_min_withdrawable / 1000,
+                faucet.amount_max_withdrawable / 1000,
             ))))
-        }
-        (&Method::GET, "/plus") => {
-            let count = faucet.remain_counter.fetch_add(1, Ordering::AcqRel);
-            Ok(Response::new(Body::from(format!("Request #{}", count + 1))))
         }
         (&Method::GET, "/faucet/qrcode.png") => {
             Ok(Response::new(Body::from(faucet.qrcode.to_vec())))

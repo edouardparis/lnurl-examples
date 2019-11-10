@@ -4,12 +4,15 @@ use image::{ImageOutputFormat, Luma};
 use qrcode::QrCode;
 use lightning_invoice::*;
 
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::{Arc, atomic::{AtomicBool, AtomicUsize, Ordering}};
+use std::time::Duration;
 use crate::error::Error;
 use crate::client::create_withdrawal;
 
 pub struct Faucet {
-    pub remain_counter: AtomicUsize,
+    pub lock_duration: usize,
+    pub remained_time: AtomicUsize,
+    pub locked: AtomicBool,
     pub amount_max_withdrawable: u64,
     pub amount_min_withdrawable: u64,
     pub lnurl: String,
@@ -19,7 +22,7 @@ pub struct Faucet {
 }
 
 impl Faucet {
-    pub fn new(url: &str, callback: &str, clt: Client, remain_counter: AtomicUsize) -> Faucet {
+    pub fn new(url: &str, callback: &str, clt: Client, lock_duration: usize ) -> Faucet {
         let encoded = bech32::encode("lnurl", url.as_bytes().to_base32()).unwrap();
         let code = QrCode::new(encoded.to_string()).unwrap();
         let mut image: Vec<u8> = Vec::new();
@@ -29,15 +32,21 @@ impl Faucet {
             amount_max_withdrawable: 1_000_000,
             amount_min_withdrawable: 10000,
             qrcode: image,
-            remain_counter: remain_counter,
+            lock_duration: lock_duration,
+            remained_time: AtomicUsize::new(0),
+            locked: AtomicBool::new(false),
             lnurl: url.to_string(),
             callback: callback.to_string(),
             client: clt,
         }
     }
 
-    pub fn is_empty(&self) -> bool {
-        return self.remain_counter.load(Ordering::Relaxed) == 0;
+    pub fn is_locked(&self) -> bool {
+        return self.remained_time.load(Ordering::Relaxed) > 0;
+    }
+
+    pub fn lock(&self) {
+        self.remained_time.fetch_add(self.lock_duration, Ordering::AcqRel);
     }
 
     pub async fn pay_invoice(&self, invoice: String) -> Result<(), Error> {
@@ -62,3 +71,12 @@ impl Faucet {
         Err(Error::BadInvoice)
     }
 }
+
+pub async fn start(faucet: Arc<Faucet>) {
+        loop {
+           tokio::timer::delay_for(Duration::new(1,0)).await;
+           if faucet.is_locked() {
+                faucet.remained_time.fetch_sub(1, Ordering::AcqRel);
+           }
+        }
+    }

@@ -26,8 +26,8 @@ pub async fn routes(
 }
 
 pub fn lnurl_withdrawal(faucet: Arc<Faucet>) ->Result<Response<Body>, error::GenericError> {
-    if faucet.is_empty() {
-        return lnurl_error("faucet is empty");
+    if faucet.is_locked() {
+        return lnurl_error("faucet is locked");
     }
     let withdrawal = serde_json::to_string(&lnurl::Withdrawal {
         default_description: "ln-faucet".to_string(),
@@ -61,6 +61,7 @@ pub async fn create_withdrawal(req: Request<Body>, faucet: Arc<Faucet>) -> Resul
             _ => {error!("{:?}", e); return lnurl_error("internal_error")},
         }
     }
+    faucet.lock();
 
     lnurl_ok()
 }
